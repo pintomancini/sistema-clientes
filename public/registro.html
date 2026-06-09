@@ -59,20 +59,25 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; padding: 15px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-white" href="index.html" style="font-size: 1.25rem;">
-                <span>⚡ Sistema<span style="color: #f59e0b;">Clientes</span></span>
-            </a>
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                <a class="nav-link text-white-50 px-2" href="index.html" style="font-size: 0.9rem; font-weight: 500;">⚠️ Alertas de Ruta</a>
-                <a class="nav-link text-white-50 px-2" href="consultas.html" style="font-size: 0.9rem; font-weight: 500;">🔍 Consultar Clientes</a>
-                <a class="nav-link btn btn-success px-3 py-2 fw-bold" href="registro.html" style="background-color: #198754 !important; color: #ffffff !important; opacity: 1 !important; border: none; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);">📝 Registrar Cliente</a>
-                <a class="nav-link text-white-50 px-2" href="desactivados.html" style="font-size: 0.9rem; font-weight: 500;">🚫 Clientes Desactivados</a>
+    <nav class="navbar navbar-expand-lg navbar-dark custom-navbar mb-5">
+    <div class="container">
+        <a class="navbar-brand text-white" href="index.html">
+            <span>⚡ Sistema</span><span class="brand-accent">Clientes</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavContent">
+            <div class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3 mt-3 mt-lg-0">
+                <a class="nav-link nav-link-reg px-2" href="index.html">⚠️ Alertas de Ruta</a>
+                <a class="nav-link nav-link-reg px-2" href="consultas.html">🔍 Consultar Clientes</a>
+                <a class="nav-link btn btn-warning px-3 py-2 fw-bold" style="background-color: #f59e0b !important; color: #1e293b !important;" href="registro.html">📝 Registrar Cliente</a>
+                <a class="nav-link nav-link-reg px-2" href="desactivados.html">🚫 Clientes Desactivados</a>
                 <a class="nav-link nav-link-reg px-2" href="sistema.html">⚙️ Sistema</a>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <div class="container mb-5">
         <div class="row justify-content-center">
