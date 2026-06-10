@@ -307,7 +307,7 @@ const path = require('path');
 // Configuración de almacenamiento temporal para el archivo subido
 const upload = multer({ dest: 'uploads/' });
 
-// ENDPOINT ADAPTADO A CLAVES FORÁNEAS (CIUDAD_ID Y TIPO_NEGOCIO_ID)
+// ENDPOINT ULTRA ESTRICTO CON VALIDACIONES MANUALES ANTES DE CONFIRMAR
 app.post('/api/clientes/importar', upload.single('archivoCsv'), async (req, res) => {
     try {
         if (!req.file) {
@@ -334,26 +334,81 @@ app.post('/api/clientes/importar', upload.single('archivoCsv'), async (req, res)
             return res.status(400).json({ error: 'Formato inválido. Columnas "codigo_cliente" y "nombre_negocio" requeridas.' });
         }
 
-        if (modo === 'sobreescribir') {
-            await db.promise().query('TRUNCATE TABLE clientes');
-        }
+        // === PASO 1: LEER Y VALIDAR TODO EN MEMORIA PRIMERO ===
+        const filasAProcesar = [];
+        const codigosVistosEnCsv = new Set();
+        const duplicadosDetectados = [];
 
-        let totalProcesados = 0;
-
-        // Recorrer filas secuencialmente
         for (let i = 1; i < lineas.length; i++) {
-            const valores = lineas[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+            // Separar por comas respetando comillas
+            const valores = lineas[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^["']|["']$/g, ''));
             const fila = {};
 
             cabeceras.forEach((cabecera, index) => {
                 fila[cabecera] = valores[index] !== undefined && valores[index] !== '' ? valores[index] : null;
             });
 
-            if (!fila.codigo_cliente || !fila.nombre_negocio) continue;
+            // Saltar líneas completamente vacías de relleno
+            if (!fila.codigo_cliente && !fila.nombre_negocio) continue;
 
-            // --- TRADUCCIÓN O INSERCIÓN AUTOMÁTICA DE CIUDAD ---
+            // ❌ VALIDACIÓN ESTRICTA 1: Código de cliente vacío o mayor a 10 dígitos
+            if (!fila.codigo_cliente) {
+                if (fs.existsSync(rutaArchivo)) fs.unlinkSync(rutaArchivo);
+                return res.status(400).json({ error: `Error en la fila ${i + 1}: El código de cliente está vacío.` });
+            }
+            if (fila.codigo_cliente.toString().length > 10) {
+                if (fs.existsSync(rutaArchivo)) fs.unlinkSync(rutaArchivo);
+                return res.status(400).json({ 
+                    error: `Validación fallida: El código de cliente "${fila.codigo_cliente}" (Fila ${i + 1}) supera los 10 dígitos permitidos.` 
+                });
+            }
+
+            // DETECTAR DUPLICADOS EN EL PROPIO CSV
+            if (codigosVistosEnCsv.has(fila.codigo_cliente)) {
+                duplicadosDetectados.push(`Fila ${i + 1}: Código ${fila.codigo_cliente} (${fila.nombre_negocio || 'Sin nombre'})`);
+            } else {
+                codigosVistosEnCsv.add(fila.codigo_cliente);
+            }
+
+            // ❌ VALIDACIÓN ESTRICTA 2: Nombre de negocio obligatorio
+            if (!fila.nombre_negocio) {
+                if (fs.existsSync(rutaArchivo)) fs.unlinkSync(rutaArchivo);
+                return res.status(400).json({ error: `Validación fallida: El comercio de la fila ${i + 1} no tiene nombre de negocio.` });
+            }
+
+            // ❌ VALIDACIÓN ESTRICTA 3: Ciudad obligatoria
+            if (!fila.ciudad || fila.ciudad.toLowerCase() === 'null' || fila.ciudad.trim() === '') {
+                if (fs.existsSync(rutaArchivo)) fs.unlinkSync(rutaArchivo);
+                return res.status(400).json({ 
+                    error: `Validación fallida: El cliente "${fila.nombre_negocio}" (Fila ${i + 1}) tiene el campo de ciudad vacío.` 
+                });
+            }
+
+            // ❌ VALIDACIÓN ESTRICTA 4: Tipo de negocio obligatorio
+            if (!fila.tipo_negocio || fila.tipo_negocio.toLowerCase() === 'null' || fila.tipo_negocio.trim() === '') {
+                if (fs.existsSync(rutaArchivo)) fs.unlinkSync(rutaArchivo);
+                return res.status(400).json({ 
+                    error: `Validación fallida: El cliente "${fila.nombre_negocio}" (Fila ${i + 1}) tiene el campo de tipo_negocio vacío.` 
+                });
+            }
+
+            filasAProcesar.push(fila);
+        }
+
+        // === PASO 2: INICIAR TRANSACCIÓN SEGURA ===
+        await db.promise().query('START TRANSACTION');
+
+        if (modo === 'sobreescribir') {
+            await db.promise().query('DELETE FROM clientes');
+        }
+
+        let nuevosInsertados = 0;
+        let actualizadosExistentes = 0;
+
+        for (const fila of filasAProcesar) {
+            // --- BUSCAR O INSERTAR CIUDAD ---
             let ciudadId = null;
-            const nombreCiudad = fila.ciudad || 'Guanare';
+            const nombreCiudad = fila.ciudad.trim();
             const [buscarCiudad] = await db.promise().query('SELECT id FROM ciudades WHERE nombre = ?', [nombreCiudad]);
             
             if (buscarCiudad.length > 0) {
@@ -363,9 +418,9 @@ app.post('/api/clientes/importar', upload.single('archivoCsv'), async (req, res)
                 ciudadId = nuevaCiudad.insertId;
             }
 
-            // --- TRADUCCIÓN O INSERCIÓN AUTOMÁTICA DE TIPO DE NEGOCIO ---
+            // --- BUSCAR O INSERTAR TIPO DE NEGOCIO ---
             let tipoNegocioId = null;
-            const nombreTipo = fila.tipo_negocio || 'General';
+            const nombreTipo = fila.tipo_negocio.trim();
             const [buscarTipo] = await db.promise().query('SELECT id FROM tipos_negocio WHERE nombre = ?', [nombreTipo]);
             
             if (buscarTipo.length > 0) {
@@ -375,7 +430,7 @@ app.post('/api/clientes/importar', upload.single('archivoCsv'), async (req, res)
                 tipoNegocioId = nuevoTipo.insertId;
             }
 
-            // --- LIMPIEZA DE FECHA ---
+            // --- TRATAMIENTO DE FECHA Y VALORES ---
             if (!fila.ultima_compra || fila.ultima_compra.toLowerCase() === 'null' || fila.ultima_compra === 'Ninguna') {
                 fila.ultima_compra = null;
             }
@@ -383,7 +438,6 @@ app.post('/api/clientes/importar', upload.single('archivoCsv'), async (req, res)
             const tipoDoc = fila.tipo_documento || 'V';
             const dirLimpia = fila.direccion_limpia || 'Dirección no especificada';
 
-            // --- CONSULTA SQL ADAPTADA A BEEKEEPER ---
             const querySQL = `
                 INSERT INTO clientes (tipo_documento, codigo_cliente, nombre_negocio, direccion_limpia, ultima_compra, estatus_ruta, ciudad_id, tipo_negocio_id)
                 VALUES (?, ?, ?, ?, ?, 'Activo', ?, ?)
@@ -398,21 +452,45 @@ app.post('/api/clientes/importar', upload.single('archivoCsv'), async (req, res)
             `;
 
             const datosCampos = [
-                tipoDoc, fila.codigo_cliente, fila.nombre_negocio, dirLimpia, fila.ultima_compra, ciudadId, tipoNegocioId, // Para el INSERT
-                tipoDoc, fila.nombre_negocio, dirLimpia, fila.ultima_compra, ciudadId, tipoNegocioId  // Para el UPDATE
+                tipoDoc, fila.codigo_cliente, fila.nombre_negocio, dirLimpia, fila.ultima_compra, ciudadId, tipoNegocioId,
+                tipoDoc, fila.nombre_negocio, dirLimpia, fila.ultima_compra, ciudadId, tipoNegocioId
             ];
 
-            await db.promise().query(querySQL, datosCampos);
-            totalProcesados++;
+            const [resultado] = await db.promise().query(querySQL, datosCampos);
+            
+            if (resultado.affectedRows === 1) {
+                nuevosInsertados++;
+            } else {
+                actualizadosExistentes++;
+            }
         }
 
+        // === PASO 3: CONFIRMAR CAMBIOS DEFINITIVOS ===
+        await db.promise().query('COMMIT');
+
         if (fs.existsSync(rutaArchivo)) fs.unlinkSync(rutaArchivo);
-        res.json({ mensaje: `¡Éxito! Se procesaron ${totalProcesados} clientes correctamente en modo ${modo}.` });
+        
+        res.json({ 
+            mensaje: `¡Éxito! Se procesó el archivo correctamente en modo ${modo}.`,
+            detallesProcesados: {
+                totalEnCsv: filasAProcesar.length,
+                nuevosGuardados: nuevosInsertados,
+                omitidosOActualizados: actualizadosExistentes
+            },
+            duplicadosEnCsv: duplicadosDetectados
+        });
 
     } catch (error) {
+        // === PASO 4: CUALQUIER FALLA INESPERADA DESHACE TODO ===
+        try {
+            await db.promise().query('ROLLBACK');
+        } catch (rollbackError) {
+            console.error('Error al hacer rollback:', rollbackError);
+        }
+
         console.error('Error en la importación:', error);
         if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        res.status(500).json({ error: 'Error en la base de datos al mapear relaciones de clientes.' });
+        res.status(500).json({ error: 'Error interno al procesar la importación.', detalles: error.message });
     }
 });
 
