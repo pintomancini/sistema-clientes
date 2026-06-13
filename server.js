@@ -1,29 +1,46 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-// Servir los archivos de la interfaz gráfica desde la carpeta 'public'
-app.use(express.static('public'));
-
-// Configuración de la conexión a tu MySQL local
+// 1. Conexión a Base de Datos
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '261626_Ajpm', // <--- Pon aquí tu contraseña real de MySQL
+    password: process.env.DB_PASSWORD, 
     database: 'Clientes Andreina'
 });
 
 db.connect((err) => {
-    if (err) {
-        console.error('Error conectando a la base de datos:', err);
-        return;
-    }
-    console.log('¡Conectado exitosamente a MySQL local!');
+    if (err) console.error('Error DB:', err);
+    else console.log('¡Conectado a MySQL!');
 });
+
+// 2. Middleware de autenticación mejorado
+app.use((req, res, next) => {
+    // Si el navegador pide un archivo (como .css, .js, .png, etc.), deja pasar
+    if (req.path !== '/' && req.path.indexOf('.') !== -1) {
+        return next();
+    }
+
+    const auth = req.headers.authorization;
+    if (auth === `Basic ${Buffer.from(process.env.SISTEMA_USER + ':' + process.env.SISTEMA_PASS).toString('base64')}`) {
+        next();
+    } else {
+        res.setHeader('WWW-Authenticate', 'Basic');
+        res.status(401).send('Acceso denegado');
+    }
+});
+
+
+// 3. Servir archivos estáticos (Ahora sí los encontrará)
+app.use(express.static('public'));
+
+app.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
 
 // ==========================================================================
 // RUTA 1: Obtener clientes en ALERTA (No han comprado en el mes actual o son nuevos)
