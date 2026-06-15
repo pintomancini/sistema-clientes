@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión - Registrar Nuevo Cliente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+
+        .custom-navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .brand-accent {
+            color: #f59e0b;
+        }
+
+        .nav-btn-registro {
+            background-color: #10b981 !important; /* Verde esmeralda para acción de registro */
+            color: #ffffff !important;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .nav-link-reg {
+            color: #cbd5e1 !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link-reg:hover {
+            color: #ffffff !important;
+        }
+
+        .form-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark custom-navbar mb-5">
+    <div class="container">
+        <a class="navbar-brand text-white" href="index.html">
+            <span>⚡ Sistema</span><span class="brand-accent">Clientes</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavContent">
+            <div class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3 mt-3 mt-lg-0">
+                <a class="nav-link nav-link-reg px-2" href="index.html">⚠️ Alertas de Ruta</a>
+                <a class="nav-link nav-link-reg px-2" href="consultas.html">🔍 Consultar Clientes</a>
+                <a class="nav-link btn btn-warning px-3 py-2 fw-bold" style="background-color: #f59e0b !important; color: #1e293b !important;" href="registro.html">📝 Registrar Cliente</a>
+                <a class="nav-link nav-link-reg px-2" href="desactivados.html">🚫 Clientes Desactivados</a>
+                <a class="nav-link nav-link-reg px-2" href="sistema.html">⚙️ Sistema</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <div class="form-container">
+                    <div class="mb-4 text-center">
+                        <h2 class="fw-bold m-0" style="letter-spacing: -0.5px;">📝 Registrar Nuevo Cliente</h2>
+                        <p class="text-muted m-0 mt-1">Completa los datos para anexar un nuevo comercio activo a la ruta de distribución.</p>
+                    </div>
+                    
+                    <form id="form-cliente" novalidate>
+                        <div class="row g-3">
+                            
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-secondary">Documento de Identidad (Cédula/RIF)</label>
+                                <div class="input-group">
+                                    <select id="tipo_documento" class="form-select form-select-sm" style="max-width: 100px; font-weight: 600;">
+                                        <option value="V">V</option>
+                                        <option value="J">J</option>
+                                        <option value="E">E</option>
+                                    </select>
+                                    <input type="text" id="codigo_cliente" class="form-control form-control-sm" placeholder="Ej: 410953101 (Sin guiones)" maxlength="10">
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-secondary">Nombre del Negocio / Razón Social</label>
+                                <input type="text" id="nombre_negocio" class="form-control form-control-sm fw-bold text-dark" placeholder="Ej: Abasto La Bendición" maxlength="150">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Ciudad</label>
+                                <select id="ciudad_id" class="form-select form-select-sm">
+                                    <option value="">🌍 Seleccione una Ciudad --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-secondary">Tipo de Negocio</label>
+                                <select id="tipo_negocio_id" class="form-select form-select-sm">
+                                    <option value="">🏪 Seleccione Tipo de Negocio --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 mb-2">
+                                <label class="form-label small fw-semibold text-secondary">Dirección Completa</label>
+                                <textarea id="direccion_limpia" class="form-control form-control-sm text-muted" rows="3" placeholder="Ej: Av. Principal entre calles 4 y 5, local Nro. 12"></textarea>
+                            </div>
+
+                            <div class="col-12 d-flex gap-3 mt-4">
+                                <a href="http://localhost:3000" class="btn btn-sm btn-secondary w-50 py-2 fw-medium" style="border-radius: 8px;">
+                                    ⬅️ Volver a Alertas
+                                </a>
+                                <button type="submit" class="btn btn-sm btn-primary w-50 py-2 fw-bold" style="background-color: #3b82f6; border-radius: 8px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);">
+                                    💾 Guardar Cliente
+                                </button>
+                            </div>
+                            
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // 1. CARGA AUTOMÁTICA DE COMBOBOX DESDE LA BASE DE DATOS
+        // ================================================================
+        async function cargarComboboxes() {
+            try {
+                // Solicitar ciudades al Backend
+                const resCiudades = await fetch('http://localhost:3000/api/ciudades');
+                const ciudades = await resCiudades.json();
+                const selectCiudades = document.getElementById('ciudad_id');
+                ciudades.forEach(c => {
+                    selectCiudades.innerHTML += `<option value="${c.id}">${c.nombre}</option>`;
+                });
+
+                // Solicitar tipos de negocio al Backend
+                const resTipos = await fetch('http://localhost:3000/api/tipos-negocio');
+                const tipos = await resTipos.json();
+                const selectTipos = document.getElementById('tipo_negocio_id');
+                tipos.forEach(t => {
+                    selectTipos.innerHTML += `<option value="${t.id}">${t.nombre}</option>`;
+                });
+            } catch (error) {
+                console.error('Error al cargar datos iniciales de las listas:', error);
+            }
+        }
+
+        // ================================================================
+        // 2. VALIDACIONES ANTES DE ENVIAR EL FORMULARIO
+        // ================================================================
+        document.getElementById('form-cliente').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Detener el envío automático de la página
+
+            // Capturamos los valores actuales escritos en la pantalla
+            const tipo_documento = document.getElementById('tipo_documento').value;
+            const codigo_cliente = document.getElementById('codigo_cliente').value.trim();
+            const nombre_negocio = document.getElementById('nombre_negocio').value.trim();
+            const ciudad_id = document.getElementById('ciudad_id').value;
+            const tipo_negocio_id = document.getElementById('tipo_negocio_id').value;
+            const direccion_limpia = document.getElementById('direccion_limpia').value.trim();
+
+            // CAPA DE SEGURIDAD 1: Validar que ningún campo esté en blanco
+            if (!codigo_cliente || !nombre_negocio || !ciudad_id || !tipo_negocio_id || !direccion_limpia) {
+                alert('⚠️ Error: Todos los campos son obligatorios. Por favor rellene el formulario.');
+                return; // Bloquea el proceso
+            }
+
+            // CAPA DE SEGURIDAD 2: Controlar límites de caracteres (Doble verificación)
+            if (codigo_cliente.length > 10) {
+                alert('⚠️ El número de identificación no puede superar los 10 caracteres.');
+                return;
+            }
+            if (nombre_negocio.length > 150) {
+                alert('⚠️ El nombre del negocio no puede superar los 150 caracteres.');
+                return;
+            }
+
+            // Armamos el paquete JSON ordenado que requiere el Servidor
+            const datosCliente = {
+                tipo_documento,
+                codigo_cliente,
+                nombre_negocio,
+                direccion_limpia,
+                ciudad_id: parseInt(ciudad_id),
+                tipo_negocio_id: parseInt(tipo_negocio_id)
+            };
+
+            // PASO 3: Enviar el paquete de datos de manera segura al Backend
+            try {
+                const response = await fetch('http://localhost:3000/api/clientes/registrar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosCliente)
+                });
+
+                const resultado = await response.json();
+
+                if (response.ok) {
+                    // Si el backend guardó con éxito:
+                    alert('🎉 ' + resultado.message);
+                    document.getElementById('form-cliente').reset(); // Limpia el formulario para otro cliente
+                } else {
+                    // Si el backend rebotó el registro (Por RIF duplicado u otro error)
+                    alert('❌ Error: ' + resultado.error);
+                }
+            } catch (error) {
+                alert('❌ Ocurrió un error de red al intentar registrar al cliente.');
+            }
+        });
+
+        // Ejecutar la carga de las listas apenas se abra la página
+        cargarComboboxes();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

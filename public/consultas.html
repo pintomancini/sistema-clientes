@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión - Consultas Personalizadas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+
+        .custom-navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .brand-accent {
+            color: #f59e0b;
+        }
+
+        .nav-btn-consultas {
+            background-color: #3b82f6 !important;
+            color: #ffffff !important;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .nav-link-reg {
+            color: #cbd5e1 !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link-reg:hover {
+            color: #ffffff !important;
+        }
+
+        .table-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            color: #64748b;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .badge-doc {
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .doc-v {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .doc-j {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .doc-e {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .badge-type {
+            background-color: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+
+        <nav class="navbar navbar-expand-lg navbar-dark custom-navbar mb-5">
+    <div class="container">
+        <a class="navbar-brand text-white" href="index.html">
+            <span>⚡ Sistema</span><span class="brand-accent">Clientes</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavContent">
+            <div class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3 mt-3 mt-lg-0">
+                <a class="nav-link nav-link-reg px-2" href="index.html">⚠️ Alertas de Ruta</a>
+                <a class="nav-link btn btn-warning px-3 py-2 fw-bold" style="background-color: #f59e0b !important; color: #1e293b !important;" href="consultas.html">🔍 Consultar Clientes</a>
+                <a class="nav-link nav-link-reg px-2" href="registro.html">📝 Registrar Cliente</a>
+                <a class="nav-link nav-link-reg px-2" href="desactivados.html">🚫 Clientes Desactivados</a>
+                <a class="nav-link nav-link-reg px-2" href="sistema.html">⚙️ Sistema</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <div class="container">
+        <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2 class="fw-bold m-0" style="letter-spacing: -0.5px;">🔍 Panel de Consultas Avanzadas</h2>
+                <p class="text-muted m-0 mt-1">Busca y audita comercios aplicando filtros personalizados sobre toda tu cartera activa.</p>
+            </div>
+            <button onclick="exportarAExcel()" class="btn fw-bold shadow-sm text-white px-3 py-2" style="background-color: #10b981; border-radius: 8px; font-size: 0.9rem;">
+                📊 Exportar Vista Actual
+            </button>
+        </div>
+
+        <div class="filter-container mb-4 shadow-sm">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-secondary">Filtrar por Ciudad</label>
+                    <select id="filtro-ciudad" class="form-select form-select-sm" onchange="filtrarYMostrar()">
+                        <option value="">🌍 Todas las ciudades</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold text-secondary">Tipo de Negocio</label>
+                    <select id="filtro-negocio" class="form-select form-select-sm" onchange="filtrarYMostrar()">
+                        <option value="">🏪 Todos los tipos</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-semibold text-secondary">Documento</label>
+                    <select id="filtro-documento" class="form-select form-select-sm" onchange="filtrarYMostrar()">
+                        <option value="">🪪 Todos</option>
+                        <option value="V">V</option>
+                        <option value="J">J</option>
+                        <option value="E">E</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold text-secondary">Condición de Actividad</label>
+                    <select id="filtro-actividad" class="form-select form-select-sm" onchange="filtrarYMostrar()">
+                        <option value="">📊 Mostrar toda la cartera activa</option>
+                        <option value="nuevos">✨ Nuevos Clientes (Sin compras aún)</option>
+                        <option value="alertas">🚨 En Alerta (Sin compra este mes o Nuevos)</option>
+                        <option value="activados">✅ Activados (Compraron este mes)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+             <label class="form-label small fw-semibold text-secondary">🔍 Buscar Cliente Particular</label>
+             <input type="text" id="buscador-nombre-codigo" class="form-control form-control-sm" placeholder="Escribe el nombre del negocio o el número de documento..." oninput="filtrarYMostrar()">
+        </div>
+
+        <div class="table-container mb-5">
+            <div class="table-responsive">
+                <table class="table align-middle m-0">
+                    <thead>
+                        <tr>
+                            <th onclick="ordenarColumna('tipo_documento')" style="cursor: pointer; user-select: none;">Doc <span id="icon-tipo_documento">↕</span></th>
+                            <th onclick="ordenarColumna('codigo_cliente')" style="cursor: pointer; user-select: none;">Código <span id="icon-codigo_cliente">↕</span></th>
+                            <th onclick="ordenarColumna('nombre_negocio')" style="cursor: pointer; user-select: none;">Nombre del Negocio <span id="icon-nombre_negocio">↕</span></th>
+                            <th onclick="ordenarColumna('tipo_negocio')" style="cursor: pointer; user-select: none;">Tipo Negocio <span id="icon-tipo_negocio">↕</span></th>
+                            <th onclick="ordenarColumna('ciudad')" style="cursor: pointer; user-select: none;">Ciudad <span id="icon-ciudad">↕</span></th>
+                            <th>Dirección</th>
+                            <th onclick="ordenarColumna('ultima_compra')" style="cursor: pointer; user-select: none;">Último Pedido <span id="icon-ultima_compra">↕</span></th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-consultas">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <div class="spinner-border spinner-border-sm text-secondary me-2" role="status"></div>
+                                Inicializando filtros y cargando datos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+            <div class="modal fade" id="modalEditarCliente" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg" style="border-radius: 14px; border: 1px solid #e2e8f0;">
+                <div class="modal-header bg-light" style="border-bottom: 1px solid #e2e8f0; border-top-left-radius: 14px; border-top-right-radius: 14px;">
+                    <h5 class="modal-title fw-bold" id="modalEditarLabel">📝 Editar Datos del Comercio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="form-editar-cliente">
+                        <input type="hidden" id="edit-id">
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <label class="form-label small fw-semibold text-secondary">Doc</label>
+                                <select id="edit-tipo-doc" class="form-select form-select-sm">
+                                    <option value="V">V</option>
+                                    <option value="J">J</option>
+                                    <option value="E">E</option>
+                                </select>
+                            </div>
+                            <div class="col-8">
+                                <label class="form-label small fw-semibold text-secondary">Código (No Editable)</label>
+                                <input type="text" id="edit-codigo" class="form-select-sm form-control bg-light" readonly disabled>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-secondary">Nombre del Negocio</label>
+                                <input type="text" id="edit-nombre" class="form-control form-control-sm fw-bold text-dark" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold text-secondary">Tipo de Negocio</label>
+                                <select id="edit-tipo-negocio" class="form-select form-select-sm"></select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-semibold text-secondary">Ciudad</label>
+                                <select id="edit-ciudad" class="form-select form-select-sm"></select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-semibold text-secondary">Dirección del Comercio</label>
+                                <textarea id="edit-direccion" class="form-control form-control-sm text-muted" rows="3" required></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                    <div class="modal-footer bg-light d-flex justify-content-between" style="border-top: 1px solid #e2e8f0; border-bottom-left-radius: 14px; border-bottom-right-radius: 14px;">
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-warning me-1 fw-bold" onclick="cambiarEstadoCliente()">🚫 Sacar de Ruta</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger fw-bold" onclick="eliminarClienteDefinitivo()">🗑️ Eliminar</button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">Volver</button>
+                        <button type="button" class="btn btn-sm btn-primary px-3 fw-bold" onclick="guardarCambiosCliente()">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        let todosLosClientes = [];  // Datos originales del backend
+        let clientesFiltrados = []; // Copia para búsquedas
+        let columnaActiva = '';
+        let ordenAscendente = true;
+
+        // Cargar listas desplegables y datos de clientes al abrir la página
+        async function inicializarPanel() {
+            try {
+                // 1. Cargar Combobox de Ciudades
+                const resCiudades = await fetch('/api/ciudades');
+                const ciudades = await resCiudades.json();
+                const selectCiudad = document.getElementById('filtro-ciudad');
+                ciudades.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.nombre;
+                    opt.textContent = c.nombre;
+                    selectCiudad.appendChild(opt);
+                });
+
+                // 2. Cargar Combobox de Tipos de Negocio
+                const resTipos = await fetch('/api/tipos-negocio');
+                const tipos = await resTipos.json();
+                const selectNegocio = document.getElementById('filtro-negocio');
+                tipos.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.nombre;
+                    opt.textContent = t.nombre;
+                    selectNegocio.appendChild(opt);
+                });
+
+                // 3. Descargar el universo total de clientes activos
+                const resClientes = await fetch('/api/clientes/todos-activos');
+                const alertas = await resClientes.json();
+                
+                todosLosClientes = alertas;
+                clientesFiltrados = [...todosLosClientes];
+                dibujarTabla(clientesFiltrados);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabla-consultas').innerHTML = `
+                    <tr><td colspan="7" class="text-center text-danger py-4">❌ Error al conectar con las rutas del servidor.</td></tr>
+                `;
+            }
+        }
+
+        // Lógica de Filtros Combinados y Acumulativos (Con Buscador Integrado)
+function filtrarYMostrar() {
+    const ciudadSel = document.getElementById('filtro-ciudad').value;
+    const negocioSel = document.getElementById('filtro-negocio').value;
+    const docSel = document.getElementById('filtro-documento').value;
+    const actividadSel = document.getElementById('filtro-actividad').value;
+    // Capturamos el texto del buscador
+    const busqueda = document.getElementById('buscador-nombre-codigo').value.toLowerCase().trim();
+
+    clientesFiltrados = todosLosClientes.filter(cliente => {
+        // Filtro por Ciudad
+        if (ciudadSel && cliente.ciudad !== ciudadSel) return false;
+
+        // Filtro por Tipo Negocio
+        if (negocioSel && cliente.tipo_negocio !== negocioSel) return false;
+
+        // Filtro por Documento
+        const docValue = (cliente.tipo_documento || 'V').trim().toUpperCase();
+        if (docSel && docValue !== docSel) return false;
+
+        // NUEVO FILTRO: Buscador dinámico por Nombre o Cédula/RIF
+        if (busqueda) {
+            const nombreNegocio = (cliente.nombre_negocio || '').toLowerCase();
+            const codigoCliente = (cliente.codigo_cliente || '').toLowerCase(); // Usa la variable exacta del query
+            
+            if (!nombreNegocio.includes(busqueda) && !codigoCliente.includes(busqueda)) {
+                return false;
+            }
+        }
+
+        // Filtro por Actividad (Nuevos, Alertas, Activados - Lógica Mes Calendario)
+        if (actividadSel) {
+            const tieneCompra = cliente.ultima_compra !== null;
+            let esDelMesActual = false;
+
+            if (tieneCompra) {
+                const hoy = new Date();
+                const fechaCompra = new Date(cliente.ultima_compra);
+
+                // Validar si el año y el mes coinciden con el día de hoy
+                if (fechaCompra.getFullYear() === hoy.getFullYear() &&
+                    fechaCompra.getMonth() === hoy.getMonth()) {
+                    esDelMesActual = true;
+                }
+            }
+
+            if (actividadSel === 'nuevos' && tieneCompra) return false;
+            if (actividadSel === 'activados' && !esDelMesActual) return false;
+            if (actividadSel === 'alertas' && esDelMesActual) return false;
+        }
+
+        return true;
+    });
+
+    if (columnaActiva !== '') {
+        aplicarOrdenamiento();
+    } else {
+        dibujarTabla(clientesFiltrados);
+    }
+}
+
+        // Lógica de Ordenamiento Ascendente / Descendente
+        function ordenarColumna(columna) {
+            const iconos = ['tipo_documento', 'codigo_cliente', 'nombre_negocio', 'tipo_negocio', 'ciudad', 'ultima_compra'];
+            iconos.forEach(id => document.getElementById(`icon-${id}`).innerText = '↕');
+
+            if (columnaActiva === columna) {
+                ordenAscendente = !ordenAscendente;
+            } else {
+                columnaActiva = columna;
+                ordenAscendente = true;
+            }
+
+            document.getElementById(`icon-${columna}`).innerText = ordenAscendente ? '↑' : '↓';
+            aplicarOrdenamiento();
+        }
+
+                 function aplicarOrdenamiento() {
+            clientesFiltrados.sort((a, b) => {
+                let valA = a[columnaActiva];
+                let valB = b[columnaActiva];
+
+                // Tratamiento especial estricto para la columna de fechas (Último Pedido)
+                if (columnaActiva === 'ultima_compra') {
+                    if (!valA && !valB) return 0;
+                    if (!valA) return 1;
+                    if (!valB) return -1;
+
+                    const fechaA = new Date(valA).getTime();
+                    const fechaB = new Date(valB).getTime();
+
+                    return ordenAscendente ? (fechaA - fechaB) : (fechaB - fechaA);
+                }
+
+                // Tratamiento estándar para campos de texto (ignorar mayúsculas/minúsculas)
+                if (typeof valA === 'string') valA = valA.toLowerCase().trim();
+                if (typeof valB === 'string') valB = valB.toLowerCase().trim();
+
+                if (valA < valB) return ordenAscendente ? -1 : 1;
+                if (valA > valB) return ordenAscendente ? 1 : -1;
+                return 0;
+            });
+
+            dibujarTabla(clientesFiltrados);
+        }
+
+        function dibujarTabla(clientes) {
+            const tbody = document.getElementById('tabla-consultas');
+            tbody.innerHTML = '';
+
+            if (clientes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">🔍 No hay clientes que coincidan con los filtros seleccionados.</td></tr>`;
+                return;
+            }
+
+            clientes.forEach(cliente => {
+                const fechaFormateada = cliente.ultima_compra ? new Date(cliente.ultima_compra).toLocaleDateString('es-ES') : 'Ninguna';
+                const docValue = (cliente.tipo_documento || 'V').trim().toUpperCase();
+                
+                let docClass = 'doc-v';
+                if (docValue === 'J') docClass = 'doc-j';
+                if (docValue === 'E') docClass = 'doc-e';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td><span class="badge badge-doc ${docClass}">${docValue}</span></td><td class="fw-semibold text-secondary small">${cliente.codigo_cliente}</td><td class="fw-bold text-dark" style="font-size: 0.9rem;">${cliente.nombre_negocio}</td><td><span class="badge badge-type text-uppercase">${cliente.tipo_negocio || 'No especificado'}</span></td><td class="text-muted fw-medium small">${cliente.ciudad || 'No registrada'}</td><td><small class="text-muted">${cliente.direccion_limpia || 'No registrada'}</small></td><td><span class="badge bg-light text-secondary border px-2 py-1">${fechaFormateada}</span></td><td><button class="btn btn-sm btn-outline-primary py-0 px-2 fw-bold" style="font-size: 0.75rem; border-radius: 6px;" onclick="abrirModalEdicion(${cliente.id_cliente || cliente.id})">📝 Editar</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+        let modalEdicionBS;
+
+                        function abrirModalEdicion(id) {
+            const cliente = todosLosClientes.find(c => c.id == id);
+            if (!cliente) return alert("No se encontraron los datos del comercio.");
+
+            const editCiudad = document.getElementById('edit-ciudad');
+            editCiudad.innerHTML = document.getElementById('filtro-ciudad').innerHTML;
+            if (editCiudad.options[0] && (editCiudad.options[0].value === "" || editCiudad.options[0].text.includes("Todas"))) {
+                editCiudad.options[0].remove();
+            }
+
+            const editNegocio = document.getElementById('edit-tipo-negocio');
+            editNegocio.innerHTML = document.getElementById('filtro-negocio').innerHTML;
+            if (editNegocio.options[0] && (editNegocio.options[0].value === "" || editNegocio.options[0].text.includes("Todos"))) {
+                editNegocio.options[0].remove();
+            }
+
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-tipo-doc').value = (cliente.tipo_documento || 'V').trim().toUpperCase();
+            document.getElementById('edit-codigo').value = cliente.codigo_cliente;
+            document.getElementById('edit-nombre').value = cliente.nombre_negocio;
+            
+            // Asigna directamente el valor de la propiedad del cliente
+            if (cliente.ciudad) editCiudad.value = cliente.ciudad;
+            if (cliente.tipo_negocio) editNegocio.value = cliente.tipo_negocio;
+
+            document.getElementById('edit-direccion').value = cliente.direccion_limpia || cliente.direccion || '';
+
+            modalEdicionBS = new bootstrap.Modal(document.getElementById('modalEditarCliente'));
+            modalEdicionBS.show();
+        }
+        
+        // Función para cambiar el estado (Desactivar / Sacar de ruta) con bloqueo de mes actual
+async function cambiarEstadoCliente() {
+    const id = document.getElementById('edit-id').value;
+    const nombre = document.getElementById('edit-nombre').value;
+    
+    // 1. CAPA DE SEGURIDAD: Buscar al cliente en el array en memoria para revisar su última compra
+    const cliente = todosLosClientes.find(c => c.id == id || c.id_cliente == id);
+    
+    if (cliente && cliente.ultima_compra) {
+        const fechaCompra = new Date(cliente.ultima_compra);
+        const fechaActual = new Date();
+
+        // Comparar año y mes (los meses en JavaScript se cuentan de 0 a 11)
+        const mismoAnio = fechaCompra.getFullYear() === fechaActual.getFullYear();
+        const mismoMes = fechaCompra.getMonth() === fechaActual.getMonth();
+
+        // Si la compra coincide con el mes y año en curso, se cancela la operación
+        if (mismoAnio && mismoMes) {
+            alert(`⛔ No se puede sacar de ruta:\nEl cliente "${nombre}" ya registra una compra en el mes actual.`);
+            return; // Frena la ejecución por completo y no permite la petición al servidor
+        }
+    }
+
+    // 2. Si pasa la validación, procede con la confirmación habitual
+    if (!confirm(`¿Estás seguro de que deseas SACAR DE LA RUTA a el comercio:\n"${nombre}"?`)) {
+        return;
+    }
+
+    try {
+        // Enviamos una petición para inactivar al cliente (status = 0 o condición = 'Inactivo')
+        const respuesta = await fetch(`/api/clientes/desactivar/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (respuesta.ok) {
+            // Lo removemos del array local en memoria para que desaparezca de la vista actual inmediatamente
+            todosLosClientes = todosLosClientes.filter(c => (c.id_cliente != id && c.id != id));
+            
+            modalEdicionBS.hide();
+            filtrarYMostrar(); // Refresca la tabla
+        } else {
+            const errData = await respuesta.json();
+            alert("❌ Error al desactivar: " + (errData.error || "No se pudo procesar"));
+        }
+    } catch (error) {
+        console.error(error);
+        alert("❌ Error de red al intentar cambiar el estado.");
+    }
+}
+                // Función para Eliminar por completo de la Base de Datos MySQL - ¡REPARADA!
+        async function eliminarClienteDefinitivo() {
+            try {
+                const id = document.getElementById('edit-id').value;
+                const nombre = document.getElementById('edit-nombre').value;
+
+                // Alerta de seguridad por ser una acción destructiva irreversible
+                if (!confirm(`⚠️ ALERTA MÁXIMA ⚠️\n¿Estás completamente seguro de ELIMINAR permanentemente a:\n"${nombre}"?\nEsta acción borrará al cliente de la base de datos.`)) {
+                    return;
+                }
+
+                const respuesta = await fetch(`/api/clientes/eliminar/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (respuesta.ok) {
+                    // Lo eliminamos de la memoria local inmediatamente
+                    todosLosClientes = todosLosClientes.filter(c => c.id != id);
+                    
+                    alert("🗑️ ¡Cliente eliminado permanentemente de la base de datos!");
+                    
+                    if (modalEdicionBS) {
+                        modalEdicionBS.hide(); // Cierra el modal flotante
+                    }
+                    filtrarYMostrar(); // Refresca la tabla en tiempo real
+                } else {
+                    const errData = await respuesta.json();
+                    alert("❌ Error al eliminar: " + (errData.error || "No se pudo procesar"));
+                }
+            } catch (error) {
+                console.error("Error en el frontend al eliminar:", error);
+                alert("❌ Error de red al intentar eliminar el registro.");
+            }
+        }
+                async function guardarCambiosCliente() {
+            try {
+                const id = document.getElementById('edit-id').value;
+                const selectCiudad = document.getElementById('edit-ciudad');
+                const selectNegocio = document.getElementById('edit-tipo-negocio');
+
+                const datosActualizados = {
+                    tipo_documento: document.getElementById('edit-tipo-doc').value,
+                    nombre_negocio: document.getElementById('edit-nombre').value.trim().toUpperCase(),
+                    tipo_negocio: selectNegocio.value,
+                    ciudad: selectCiudad.value,
+                    direccion: document.getElementById('edit-direccion').value.trim()
+                };
+
+                if (!datosActualizados.nombre_negocio || !datosActualizados.direccion) {
+                    return alert("Por favor complete los campos obligatorios.");
+                }
+
+                const respuesta = await fetch(`/api/clientes/actualizar/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosActualizados)
+                });
+
+                if (respuesta.ok) {
+                    const index = todosLosClientes.findIndex(c => c.id == id);
+                    if (index !== -1) {
+                        todosLosClientes[index].tipo_documento = datosActualizados.tipo_documento;
+                        todosLosClientes[index].nombre_negocio = datosActualizados.nombre_negocio;
+                        todosLosClientes[index].tipo_negocio = datosActualizados.tipo_negocio;
+                        todosLosClientes[index].ciudad = datosActualizados.ciudad;
+                        todosLosClientes[index].direccion_limpia = datosActualizados.direccion;
+                    }
+                    
+                    alert("✅ ¡Cliente actualizado exitosamente!");
+                    
+                    if (modalEdicionBS) {
+                        modalEdicionBS.hide();
+                    }
+                    filtrarYMostrar();
+                } else {
+                    const errData = await respuesta.json();
+                    alert("❌ Error del servidor: " + (errData.error || "No se pudo actualizar"));
+                }
+            } catch (error) {
+                console.error("Error en el frontend al guardar:", error);
+                alert("❌ Ocurrió un error en el navegador al procesar el guardado.");
+            }
+        }
+
+        // NUEVA FUNCIÓN: Exportar los datos actuales visibles en pantalla a CSV (Excel)
+        function exportarAExcel() {
+            if (clientesFiltrados.length === 0) {
+                alert("❌ No hay datos en pantalla para exportar.");
+                return;
+            }
+
+            // 1. Cabeceras del archivo
+            let contenidoCsv = "Doc,Código,Nombre del Negocio,Tipo de Negocio,Ciudad,Dirección,Último Pedido\n";
+
+            // 2. Mapear cada elemento actualmente filtrado/ordenado
+            clientesFiltrados.forEach(cliente => {
+                const doc = (cliente.tipo_documento || 'V').trim().toUpperCase();
+                const codigo = cliente.codigo_cliente || '';
+                const nombre = (cliente.nombre_negocio || '').replace(/"/g, '""'); // Escapar comillas dobles internas
+                const tipo = (cliente.tipo_negocio || 'No especificado').replace(/"/g, '""');
+                const ciudad = (cliente.ciudad || 'No registrada').replace(/"/g, '""');
+                const direccion = (cliente.direccion_limpia || cliente.direccion || 'No registrada').replace(/"/g, '""');
+                const ultimaCompra = cliente.ultima_compra ? new Date(cliente.ultima_compra).toLocaleDateString('es-ES') : 'Ninguna';
+
+                // Envolver campos de texto en comillas para evitar rupturas por comas locales
+                contenidoCsv += `"${doc}","${codigo}","${nombre}","${tipo}","${ciudad}","${direccion}","${ultimaCompra}"\n`;
+            });
+
+            // 3. Agregar la firma del BOM UTF-8 para obligar a Excel a leer acentos, tildes y emojis perfectamente
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), contenidoCsv], { type: "text/csv;charset=utf-8;" });
+            
+            // 4. Crear disparador de descarga automática en el navegador
+            const enlace = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            // Generar un nombre de archivo dinámico limpio
+            const fechaHoy = new Date().toISOString().slice(0, 10);
+            enlace.setAttribute("href", url);
+            enlace.setAttribute("download", `reporte_clientes_${fechaHoy}.csv`);
+            enlace.style.visibility = 'hidden';
+            
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+        }
+
+        inicializarPanel();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

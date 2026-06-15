@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión - Alertas de Desactivación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+
+        .custom-navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .brand-accent {
+            color: #f59e0b;
+        }
+
+        .nav-btn-alert {
+            background-color: #f59e0b !important;
+            color: #0f172a !important;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link-reg {
+            color: #cbd5e1 !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link-reg:hover {
+            color: #ffffff !important;
+        }
+
+        .table-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+            border: 1px solid #e2e8f0;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            color: #64748b;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .badge-doc {
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .doc-v {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .doc-j {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+
+        .doc-e {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .badge-alert {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 5px 12px;
+            border-radius: 50px;
+        }
+
+        .badge-status {
+            background-color: #dcfce7;
+            color: #166534;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .badge-type {
+            background-color: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+
+        .btn-activate {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+        <nav class="navbar navbar-expand-lg navbar-dark custom-navbar mb-5">
+        <div class="container">
+            <a class="navbar-brand text-white" href="index.html">
+                <span>⚡ Sistema<span class="brand-accent">Clientes</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <div class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3 mt-3 mt-lg-0">
+                    <a class="nav-link btn btn-warning px-3 py-2 fw-bold" href="index.html" style="background-color: #f59e0b !important; color: #000000 !important; opacity: 1 !important; border: none;">⚠️ Alertas de Ruta</a>
+                    <a class="nav-link nav-link-reg px-2" href="consultas.html">🔍 Consultar Clientes</a>
+                    <a class="nav-link nav-link-reg px-2" href="registro.html">📝 Registrar Cliente</a>
+                    <a class="nav-link nav-link-reg px-2" href="desactivados.html">🚫 Clientes Desactivados</a>
+                    <a class="nav-link nav-link-reg px-2" href="sistema.html">⚙️ Sistema</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="mb-4">
+            <h2 class="fw-bold m-0" style="letter-spacing: -0.5px;">🚨 Monitor de Alertas de Desactivación</h2>
+            <p class="text-muted m-0 mt-1">Control de comercios inactivos en la ruta según la última fecha de compra
+                registrada.</p>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-3"
+                    style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #22c55e !important;">
+                    <div class="text-muted small fw-medium text-uppercase">Cobertura de Ruta</div>
+                    <div class="d-flex align-items-baseline gap-2 mt-1">
+                        <span class="fs-2 fw-bold text-dark" id="stat-porcentaje">0%</span>
+                        <span class="text-muted small">meta mensual</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-3"
+                    style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #3b82f6 !important;">
+                    <div class="text-muted small fw-medium text-uppercase">Clientes Activados</div>
+                    <div class="d-flex align-items-baseline gap-2 mt-1">
+                        <span class="fs-2 fw-bold text-dark" id="stat-activados">0</span>
+                        <span class="text-muted small">compras este mes</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-3"
+                    style="border-radius: 12px; background-color: #ffffff; border-left: 5px solid #ef4444 !important;">
+                    <div class="text-muted small fw-medium text-uppercase">Clientes Faltantes</div>
+                    <div class="d-flex align-items-baseline gap-2 mt-1">
+                        <span class="fs-2 fw-bold text-dark" id="stat-faltantes">0</span>
+                        <span class="text-muted small">en riesgo de alerta</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+                <div class="bg-white p-4 rounded-3 border mb-4 shadow-sm" style="border-radius: 12px !important;">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="filtarCiudad" class="form-label fw-semibold text-secondary small">Filtrar por Ciudad</label>
+                    <select id="filtarCiudad" class="form-select" style="border-radius: 8px;">
+                        <option value="Todos">🌏 Todas las ciudades</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="filtrarTipo" class="form-label fw-semibold text-secondary small">Tipo de Negocio</label>
+                    <select id="filtrarTipo" class="form-select" style="border-radius: 8px;">
+                        <option value="Todos">🏪 Todos los tipos</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="filtrarDocumento" class="form-label fw-semibold text-secondary small">Documento</label>
+                    <select id="filtrarDocumento" class="form-select" style="border-radius: 8px;">
+                        <option value="Todos">🪪 Todos</option>
+                        <option value="V">V</option>
+                        <option value="J">J</option>
+                        <option value="E">E</option>
+                    </select>
+                </div>
+                <div class="col-12 mt-3">
+                    <label for="buscarCliente" class="form-label fw-semibold text-secondary small">🔍 Buscar Cliente Particular</label>
+                    <input type="text" id="buscarCliente" class="form-control" placeholder="Escribe el nombre del negocio o el número de documento..." style="border-radius: 8px; padding: 10px;">
+                </div>
+            </div>
+        </div>
+        <div class="table-container mb-5">
+            <div class="table-responsive">
+                <table class="table align-middle m-0">
+                    <thead>
+                        <tr>
+                            <th onclick="ordenarColumna('tipo_documento')" style="cursor: pointer; user-select: none;">
+                                Doc <span id="icon-tipo_documento">↕</span></th>
+                            <th onclick="ordenarColumna('codigo_cliente')" style="cursor: pointer; user-select: none;">
+                                Código <span id="icon-codigo_cliente">↕</span></th>
+                            <th onclick="ordenarColumna('nombre_negocio')" style="cursor: pointer; user-select: none;">
+                                Nombre del Negocio <span id="icon-nombre_negocio">↕</span></th>
+                            <th onclick="ordenarColumna('tipo_negocio')" style="cursor: pointer; user-select: none;">
+                                Tipo Negocio <span id="icon-tipo_negocio">↕</span></th>
+                            <th onclick="ordenarColumna('ciudad')" style="cursor: pointer; user-select: none;">Ciudad
+                                <span id="icon-ciudad">↕</span>
+                            </th>
+                            <th>Dirección</th>
+                            <th onclick="ordenarColumna('ultima_compra')" style="cursor: pointer; user-select: none;">
+                                Último Pedido <span id="icon-ultima_compra">↕</span></th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-alertas">
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <div class="spinner-border spinner-border-sm text-secondary me-2" role="status"></div>
+                                Cargando datos sincronizados...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // VARIABLES GLOBALES PARA CONTROLAR EL ORDENAMIENTO
+        let datosClientes = []; // Guardará temporalmente los clientes descargados
+        let columnaActiva = '';  // Guarda qué columna está ordenando actualmente
+        let ordenAscendente = true; // Controla si es A-Z (true) o Z-A (false)
+
+        async function registrarPedido(clienteId) {
+            if (!confirm('¿Confirmar registro de pedido para este comercio hoy?')) return;
+
+            try {
+                const respuesta = await fetch(`/api/clientes/activar/${clienteId}`, {
+                    method: 'POST'
+                });
+
+                if (respuesta.ok) {
+                    alert('✓ ¡Pedido registrado con éxito! Fecha de última compra actualizada.');
+                    cargarAlertas(); // Recarga y mantiene la estructura limpia
+                } else {
+                    alert('❌ Error al registrar el pedido.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('❌ Error de conexión con el servidor.');
+            }
+        }
+
+        async function cargarEstadisticas() {
+            try {
+                const respuesta = await fetch('/api/clientes/estadisticas');
+                const stats = await respuesta.json();
+
+                document.getElementById('stat-porcentaje').innerText = `${stats.porcentaje}%`;
+                document.getElementById('stat-activados').innerText = stats.activados;
+                document.getElementById('stat-faltantes').innerText = stats.faltantes;
+            } catch (error) {
+                console.error("Error cargando estadísticas:", error);
+            }
+        }
+
+        async function cargarAlertas() {
+            cargarEstadisticas();
+
+            try {
+                const respuesta = await fetch('/api/clientes/alertas');
+                datosClientes = await respuesta.json();
+
+                // Inicializamos los selectores con las ciudades y tipos reales
+                poblarSelectores();
+
+                // Siempre llamamos a aplicarFiltros. Él sabrá si debe ordenar o no.
+                aplicarFiltros();
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabla-alertas').innerHTML = `
+                    <tr><td colspan="8" class="text-center text-danger py-4">❌ Error de conexión al cargar la base de datos.</td></tr>
+                `;
+            }
+        }
+
+        // NUEVA FUNCIÓN: Se encarga de procesar el clic en los encabezados
+        function ordenarColumna(columna) {
+            // Restablecer los iconos anteriores a su estado base ↕
+            const iconos = ['tipo_documento', 'codigo_cliente', 'nombre_negocio', 'tipo_negocio', 'ciudad', 'ultima_compra'];
+            iconos.forEach(id => {
+                document.getElementById(`icon-${id}`).innerText = '↕';
+            });
+
+            // Si hace clic en la misma columna, invierte la dirección (A-Z -> Z-A)
+            if (columnaActiva === columna) {
+                ordenAscendente = !ordenAscendente;
+            } else {
+                columnaActiva = columna;
+                ordenAscendente = true; // Por defecto arranca en Ascendente
+            }
+
+            // Colocar la flecha correspondiente en la columna seleccionada
+            document.getElementById(`icon-${columna}`).innerText = ordenAscendente ? '↑' : '↓';
+
+            // Ejecutar el ordenamiento y pintar la tabla
+            aplicarOrdenamiento();
+        }
+
+                // NUEVA FUNCIÓN: Algoritmo de comparación en memoria
+        function aplicarOrdenamiento() {
+            // Ya no ordenamos el array global aquí para que no se rompa la lógica.
+            // Simplemente delegamos todo el trabajo al filtro.
+            aplicarFiltros();
+        }
+
+        // NUEVA FUNCIÓN: Encargada puramente de renderizar los elementos en el HTML
+        function dibujarTabla(clientes) {
+            const tbody = document.getElementById('tabla-alertas');
+            tbody.innerHTML = '';
+
+            if (clientes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">🎉 No hay comercios en riesgo de desactivación.</td></tr>`;
+                return;
+            }
+
+            clientes.forEach(cliente => {
+                const fechaFormateada = cliente.ultima_compra ? new Date(cliente.ultima_compra).toLocaleDateString('es-ES') : 'Ninguna';
+                const docValue = (cliente.tipo_documento || 'V').trim().toUpperCase();
+
+                let docClass = 'doc-v';
+                if (docValue === 'J') docClass = 'doc-j';
+                if (docValue === 'E') docClass = 'doc-e';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                <td><span class="badge badge-doc ${docClass}">${docValue}</span></td>
+                <td class="fw-semibold text-secondary small">${cliente.codigo_cliente}</td>
+                <td class="fw-bold text-dark" style="font-size: 0.9rem;">${cliente.nombre_negocio}</td>
+                <td><span class="badge badge-type text-uppercase">${cliente.tipo_negocio || 'No especificado'}</span></td>
+                <td class="text-muted fw-medium small">${cliente.ciudad || 'No registrada'}</td>
+                <td><small class="text-muted">${cliente.direccion_limpia || 'No registrada'}</small></td>
+                <td><span class="badge bg-light text-secondary border px-2 py-1">${fechaFormateada}</span></td>
+                <td class="text-center">
+                <button class="btn btn-sm btn-outline-dark btn-activate" onclick="registrarPedido(${cliente.id})">
+                🛒 Activar Cliente
+             </button>
+             </td>
+             `;
+                tbody.appendChild(tr);
+            });
+        }
+        // === LOGICA DE FILTRADO Y BUSQUEDA REAL ===
+
+// 1. Llena las opciones de tus selectores con los datos reales de la BD
+// === LOGICA DE FILTRADO Y BUSQUEDA REAL ===
+
+// 1. Llena las opciones de tus selectores manteniendo intacta la opción seleccionada por el usuario
+function poblarSelectores() {
+    const selectCiudad = document.getElementById('filtarCiudad');
+    const selectTipo = document.getElementById('filtrarTipo');
+
+    // SOLUCIÓN: Guardamos lo que el usuario tenía seleccionado antes de reconstruir el HTML
+    const ciudadSeleccionadaAnterior = selectCiudad.value || 'Todos';
+    const tipoSeleccionadoAnterior = selectTipo.value || 'Todos';
+
+    selectCiudad.innerHTML = '<option value="Todos">🌏 Todas las ciudades</option>';
+    selectTipo.innerHTML = '<option value="Todos">🏪 Todos los tipos</option>';
+
+    const ciudades = new Set();
+    const tipos = new Set();
+
+    datosClientes.forEach(c => {
+        if (c.ciudad) ciudades.add(c.ciudad.trim());
+        if (c.tipo_negocio) tipos.add(c.tipo_negocio.trim());
+    });
+
+    Array.from(ciudades).sort().forEach(ciudad => {
+        selectCiudad.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
+    });
+
+    Array.from(tipos).sort().forEach(tipo => {
+        selectTipo.innerHTML += `<option value="${tipo}">${tipo}</option>`;
+    });
+
+    // SOLUCIÓN: Le devolvemos a los selectores el valor que tenían antes de la recarga
+    selectCiudad.value = ciudadSeleccionadaAnterior;
+    selectTipo.value = tipoSeleccionadoAnterior;
+}
+
+// 2. Procesa la búsqueda y los selectores manteniendo tu ordenamiento activo
+function aplicarFiltros() {
+    const filtroCiudad = document.getElementById('filtarCiudad').value;
+    const filtroTipo = document.getElementById('filtrarTipo').value;
+    const filtroDoc = document.getElementById('filtrarDocumento').value;
+    const busqueda = document.getElementById('buscarCliente').value.toLowerCase().trim();
+
+    // 1. FILTRAR: Filtramos sin romper ni modificar el array original datosClientes
+    let clientesProcesados = datosClientes.filter(cliente => {
+        const cumpleCiudad = (filtroCiudad === 'Todos' || cliente.ciudad === filtroCiudad);
+        const cumpleTipo = (filtroTipo === 'Todos' || cliente.tipo_negocio === filtroTipo);
+        const cumpleDoc = (filtroDoc === 'Todos' || cliente.tipo_documento === filtroDoc);
+        
+        const cumpleBusqueda = (!busqueda || 
+            (cliente.nombre_negocio && cliente.nombre_negocio.toLowerCase().includes(busqueda)) ||
+            (cliente.codigo_cliente && cliente.codigo_cliente.toString().includes(busqueda))
+        );
+
+        return cumpleCiudad && cumpleTipo && cumpleDoc && cumpleBusqueda;
+    });
+
+    // 2. ORDENAR: Si hay una columna activa, ordenamos la lista ya filtrada antes de pintarla
+    if (typeof columnaActiva !== 'undefined' && columnaActiva !== '') {
+        clientesProcesados.sort((a, b) => {
+            let valA = a[columnaActiva];
+            let valB = b[columnaActiva];
+
+            // Manejo especial para fechas
+            if (columnaActiva === 'ultima_compra') {
+                if (!valA && !valB) return 0;
+                if (!valA) return 1;
+                if (!valB) return -1;
+                const fechaA = new Date(valA).getTime();
+                const fechaB = new Date(valB).getTime();
+                return ordenAscendente ? (fechaA - fechaB) : (fechaB - fechaA);
+            }
+
+            // Tratamiento estándar para textos
+            if (typeof valA === 'string') valA = valA.toLowerCase().trim();
+            if (typeof valB === 'string') valB = valB.toLowerCase().trim();
+
+            if (valA < valB) return ordenAscendente ? -1 : 1;
+            if (valA > valB) return ordenAscendente ? 1 : -1;
+            return 0;
+        });
+    }
+
+    // 3. DIBUJAR: Mandamos a pintar únicamente el resultado final procesado
+    dibujarTabla(clientesProcesados);
+}
+
+// 3. Escuchadores para que la tabla reaccione al escribir o cambiar una opción
+document.getElementById('filtarCiudad').addEventListener('change', aplicarFiltros);
+document.getElementById('filtrarTipo').addEventListener('change', aplicarFiltros);
+document.getElementById('filtrarDocumento').addEventListener('change', aplicarFiltros);
+document.getElementById('buscarCliente').addEventListener('input', aplicarFiltros);
+
+// 2. Procesa la búsqueda y los selectores sin tocar tus estadísticas
+// 2. Procesa la búsqueda y los selectores manteniendo tu ordenamiento activo
+function aplicarFiltros() {
+    const filtroCiudad = document.getElementById('filtarCiudad').value;
+    const filtroTipo = document.getElementById('filtrarTipo').value;
+    const filtroDoc = document.getElementById('filtrarDocumento').value;
+    const busqueda = document.getElementById('buscarCliente').value.toLowerCase().trim();
+
+    // 1. FILTRAR: Filtramos sin romper ni modificar el array original datosClientes
+    let clientesProcesados = datosClientes.filter(cliente => {
+        const cumpleCiudad = (filtroCiudad === 'Todos' || cliente.ciudad === filtroCiudad);
+        const cumpleTipo = (filtroTipo === 'Todos' || cliente.tipo_negocio === filtroTipo);
+        const cumpleDoc = (filtroDoc === 'Todos' || cliente.tipo_documento === filtroDoc);
+        
+        const cumpleBusqueda = (!busqueda || 
+            (cliente.nombre_negocio && cliente.nombre_negocio.toLowerCase().includes(busqueda)) ||
+            (cliente.codigo_cliente && cliente.codigo_cliente.toString().includes(busqueda))
+        );
+
+        return cumpleCiudad && cumpleTipo && cumpleDoc && cumpleBusqueda;
+    });
+
+    // 2. ORDENAR: Si hay una columna activa, ordenamos la lista ya filtrada antes de pintarla
+    if (typeof columnaActiva !== 'undefined' && columnaActiva !== '') {
+        clientesProcesados.sort((a, b) => {
+            let valA = a[columnaActiva];
+            let valB = b[columnaActiva];
+
+            // Manejo especial para fechas
+            if (columnaActiva === 'ultima_compra') {
+                if (!valA && !valB) return 0;
+                if (!valA) return 1;
+                if (!valB) return -1;
+                const fechaA = new Date(valA).getTime();
+                const fechaB = new Date(valB).getTime();
+                return ordenAscendente ? (fechaA - fechaB) : (fechaB - fechaA);
+            }
+
+            // Tratamiento estándar para textos
+            if (typeof valA === 'string') valA = valA.toLowerCase().trim();
+            if (typeof valB === 'string') valB = valB.toLowerCase().trim();
+
+            if (valA < valB) return ordenAscendente ? -1 : 1;
+            if (valA > valB) return ordenAscendente ? 1 : -1;
+            return 0;
+        });
+    }
+
+    // 3. DIBUJAR: Mandamos a pintar únicamente el resultado final procesado
+    dibujarTabla(clientesProcesados);
+}
+
+// 3. Escuchadores para que la tabla reaccione al escribir o cambiar una opción
+document.getElementById('filtarCiudad').addEventListener('change', aplicarFiltros);
+document.getElementById('filtrarTipo').addEventListener('change', aplicarFiltros);
+document.getElementById('filtrarDocumento').addEventListener('change', aplicarFiltros);
+document.getElementById('buscarCliente').addEventListener('input', aplicarFiltros);
+        // Ejecución inicial al abrir la página
+        cargarAlertas();  
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

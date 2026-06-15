@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión - Clientes Desactivados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+
+        .custom-navbar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .brand-accent {
+            color: #f59e0b;
+        }
+
+        .nav-btn-desactivados {
+            background-color: #ef4444 !important; /* Rojo para la sección de desactivados */
+            color: #ffffff !important;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .nav-link-reg {
+            color: #cbd5e1 !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link-reg:hover {
+            color: #ffffff !important;
+        }
+
+        .table-container {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 18px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.8px;
+            color: #64748b;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .badge-doc {
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .doc-v { background-color: #e0f2fe; color: #0369a1; }
+        .doc-j { background-color: #fef3c7; color: #b45309; }
+        .doc-e { background-color: #f3e8ff; color: #6b21a8; }
+
+        .badge-type {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            font-weight: 500;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark custom-navbar mb-5">
+    <div class="container">
+        <a class="navbar-brand text-white" href="index.html">
+            <span>⚡ Sistema</span><span class="brand-accent">Clientes</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavContent">
+            <div class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3 mt-3 mt-lg-0">
+                <a class="nav-link nav-link-reg px-2" href="index.html">⚠️ Alertas de Ruta</a>
+                <a class="nav-link nav-link-reg px-2" href="consultas.html">🔍 Consultar Clientes</a>
+                <a class="nav-link nav-link-reg px-2" href="registro.html">📝 Registrar Cliente</a>
+                <a class="nav-link btn btn-warning px-3 py-2 fw-bold" style="background-color: #f59e0b !important; color: #1e293b !important;" href="desactivados.html">🚫 Clientes Desactivados</a>
+                <a class="nav-link nav-link-reg px-2" href="sistema.html">⚙️ Sistema</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <div class="container">
+        <div class="mb-4 d-flex justify-content-between align-items-end">
+            <div>
+                <h2 class="fw-bold m-0" style="letter-spacing: -0.5px;">🚫 Historial de Clientes Desactivados</h2>
+                <p class="text-muted m-0 mt-1">Listado de comercios fuera de ruta. Puedes filtrarlos, exportarlos o reintegrarlos al sistema.</p>
+            </div>
+            <button class="btn btn-sm btn-success px-3 py-2 fw-bold" onclick="exportarAExcel()" style="border-radius: 8px; box-shadow: 0 4px 12px rgba(25, 135, 84, 0.15);">
+                📊 Exportar a Hoja de Cálculo
+            </button>
+        </div>
+
+        <div class="filter-container mb-4 shadow-sm">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold text-secondary">Filtrar por Ciudad</label>
+                    <select id="filtro-ciudad" class="form-select form-select-sm" onchange="filtrarYMostrar()">
+                        <option value="">🌍 Todas las ciudades</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold text-secondary">Tipo de Negocio</label>
+                    <select id="filtro-negocio" class="form-select form-select-sm" onchange="filtrarYMostrar()">
+                        <option value="">🏪 Todos los tipos</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold text-secondary">Documento</label>
+                    <select id="filtro-documento" class="form-select form-select-sm" onchange="filtrarYMostrar()">
+                        <option value="">🪪 Todos</option>
+                        <option value="V">V</option>
+                        <option value="J">J</option>
+                        <option value="E">E</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+            <label class="form-label small fw-semibold text-secondary">🔍 Buscar Cliente Desactivado</label>
+            <input type="text" id="buscador-inactivos" class="form-control form-control-sm" placeholder="Escribe el nombre del negocio o el número de documento para ubicarlo..." oninput="filtrarYMostrar()">
+        </div>
+
+        <div class="table-container mb-5">
+            <div class="table-responsive">
+                <table class="table align-middle m-0">
+                    <thead>
+                        <tr>
+                            <th onclick="ordenarColumna('tipo_documento')" style="cursor: pointer; user-select: none;">Doc <span id="icon-tipo_documento">↕</span></th>
+                            <th onclick="ordenarColumna('codigo_cliente')" style="cursor: pointer; user-select: none;">Código <span id="icon-codigo_cliente">↕</span></th>
+                            <th onclick="ordenarColumna('nombre_negocio')" style="cursor: pointer; user-select: none;">Nombre del Negocio <span id="icon-nombre_negocio">↕</span></th>
+                            <th onclick="ordenarColumna('tipo_negocio')" style="cursor: pointer; user-select: none;">Tipo Negocio <span id="icon-tipo_negocio">↕</span></th>
+                            <th onclick="ordenarColumna('ciudad')" style="cursor: pointer; user-select: none;">Ciudad <span id="icon-ciudad">↕</span></th>
+                            <th>Dirección</th>
+                            <th onclick="ordenarColumna('ultima_compra')" style="cursor: pointer; user-select: none;">Último Pedido <span id="icon-ultima_compra">↕</span></th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-desactivados">
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <div class="spinner-border spinner-border-sm text-secondary me-2" role="status"></div>
+                                Cargando historial de bajas...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let todosLosInactivos = [];  
+        let clientesFiltrados = []; 
+        let columnaActiva = '';
+        let ordenAscendente = true;
+
+        async function inicializarPanel() {
+            try {
+                // 1. Cargar Combobox de Ciudades
+                const resCiudades = await fetch('http://localhost:3000/api/ciudades');
+                const ciudades = await resCiudades.json();
+                const selectCiudad = document.getElementById('filtro-ciudad');
+                ciudades.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.nombre;
+                    opt.textContent = c.nombre;
+                    selectCiudad.appendChild(opt);
+                });
+
+                // 2. Cargar Combobox de Tipos de Negocio
+                const resTipos = await fetch('http://localhost:3000/api/tipos-negocio');
+                const tipos = await resTipos.json();
+                const selectNegocio = document.getElementById('filtro-negocio');
+                tipos.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.nombre;
+                    opt.textContent = t.nombre;
+                    selectNegocio.appendChild(opt);
+                });
+
+                // 3. Descargar el universo total de clientes INACTIVOS del backend
+                // NOTA: Ajusta esta URL si tu endpoint de inactivos se llama diferente
+                const resClientes = await fetch('http://localhost:3000/api/clientes/todos-inactivos');
+                todosLosInactivos = await resClientes.json();
+                
+                clientesFiltrados = [...todosLosInactivos];
+                dibujarTabla(clientesFiltrados);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('tabla-desactivados').innerHTML = `
+                    <tr><td colspan="8" class="text-center text-danger py-4">❌ Error al conectar con los registros de clientes inactivos.</td></tr>
+                `;
+            }
+        }
+
+        // Lógica de Filtros en Desactivados con Buscador Dinámico
+function filtrarYMostrar() {
+    const ciudadSel = document.getElementById('filtro-ciudad').value;
+    const negocioSel = document.getElementById('filtro-negocio').value;
+    const docSel = document.getElementById('filtro-documento').value;
+    
+    // Capturamos el texto que estás digitando en el buscador
+    const busqueda = document.getElementById('buscador-inactivos').value.toLowerCase().trim();
+
+    // Filtramos sobre el array de clientes que están fuera de ruta
+    clientesFiltrados = todosLosInactivos.filter(cliente => {
+        // Filtro por Ciudad
+        if (ciudadSel && cliente.ciudad !== ciudadSel) return false;
+
+        // Filtro por Tipo Negocio
+        if (negocioSel && cliente.tipo_negocio !== negocioSel) return false;
+
+        // Filtro por Documento (Cédula / RIF)
+        const docValue = (cliente.tipo_documento || 'V').trim().toUpperCase();
+        if (docSel && docValue !== docSel) return false;
+
+        // NUEVO FILTRO: Evalúa coincidencia en nombre o código de cliente
+        if (busqueda) {
+            const nombreNegocio = (cliente.nombre_negocio || '').toLowerCase();
+            const codigoCliente = (cliente.codigo_cliente || '').toLowerCase(); // Coincide con tu backend de server.js
+            
+            // Si el texto digitado no está en el nombre ni en la identificación, lo oculta
+            if (!nombreNegocio.includes(busqueda) && !codigoCliente.includes(busqueda)) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+
+    // Renderiza la tabla limpia con el ordenamiento configurado o directo al dibujo
+    if (columnaActiva !== '') {
+        aplicarOrdenamiento();
+    } else {
+        dibujarTabla(clientesFiltrados);
+    }
+}
+
+        function ordenarColumna(columna) {
+            const iconos = ['tipo_documento', 'codigo_cliente', 'nombre_negocio', 'tipo_negocio', 'ciudad', 'ultima_compra'];
+            iconos.forEach(id => document.getElementById(`icon-${id}`).innerText = '↕');
+
+            if (columnaActiva === columna) {
+                ordenAscendente = !ordenAscendente;
+            } else {
+                columnaActiva = columna;
+                ordenAscendente = true;
+            }
+
+            document.getElementById(`icon-${columna}`).innerText = ordenAscendente ? '↑' : '↓';
+            aplicarOrdenamiento();
+        }
+
+        function aplicarOrdenamiento() {
+            clientesFiltrados.sort((a, b) => {
+                let valA = a[columnaActiva];
+                let valB = b[columnaActiva];
+
+                if (columnaActiva === 'ultima_compra') {
+                    if (!valA && !valB) return 0;
+                    if (!valA) return 1;
+                    if (!valB) return -1;
+                    return ordenAscendente ? (new Date(valA).getTime() - new Date(valB).getTime()) : (new Date(valB).getTime() - new Date(valA).getTime());
+                }
+
+                if (typeof valA === 'string') valA = valA.toLowerCase().trim();
+                if (typeof valB === 'string') valB = valB.toLowerCase().trim();
+
+                if (valA < valB) return ordenAscendente ? -1 : 1;
+                if (valA > valB) return ordenAscendente ? 1 : -1;
+                return 0;
+            });
+            dibujarTabla(clientesFiltrados);
+        }
+
+        function dibujarTabla(clientes) {
+            const tbody = document.getElementById('tabla-desactivados');
+            tbody.innerHTML = '';
+
+            if (clientes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">🔍 No hay clientes inactivos que coincidan con la búsqueda.</td></tr>`;
+                return;
+            }
+
+            clientes.forEach(cliente => {
+                const fechaFormateada = cliente.ultima_compra ? new Date(cliente.ultima_compra).toLocaleDateString('es-ES') : 'Ninguna';
+                const docValue = (cliente.tipo_documento || 'V').trim().toUpperCase();
+                
+                let docClass = 'doc-v';
+                if (docValue === 'J') docClass = 'doc-j';
+                if (docValue === 'E') docClass = 'doc-e';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge badge-doc ${docClass}">${docValue}</span></td>
+                    <td class="fw-semibold text-secondary small">${cliente.codigo_cliente}</td>
+                    <td class="fw-bold text-dark" style="font-size: 0.9rem;">${cliente.nombre_negocio}</td>
+                    <td><span class="badge badge-type text-uppercase">${cliente.tipo_negocio || 'No especificado'}</span></td>
+                    <td class="text-muted fw-medium small">${cliente.ciudad || 'No registrada'}</td>
+                    <td><small class="text-muted">${cliente.direccion_limpia || cliente.direccion || 'No registrada'}</small></td>
+                    <td><span class="badge bg-light text-secondary border px-2 py-1">${fechaFormateada}</span></td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-success py-1 px-2 fw-bold" style="font-size: 0.75rem; border-radius: 6px;" onclick="reintegrarCliente(${cliente.id_cliente || cliente.id}, '${cliente.nombre_negocio}')">
+                            🔄 Reintegrar
+                        </button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ACCIÓN: REINTEGRAR CLIENTE A LA RUTA (status = 1)
+        async function reintegrarCliente(id, nombre) {
+            if (!confirm(`¿Estás seguro de REINTEGRAR a la ruta activa al comercio:\n"${nombre}"?`)) {
+                return;
+            }
+
+            try {
+                // Petición al Backend para activar al cliente
+                const respuesta = await fetch(`http://localhost:3000/api/clientes/activar-ruta/${id}`, {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' }
+                 });
+
+                if (respuesta.ok) {
+                    alert(`✅ ¡"${nombre}" ha sido reintegrado con éxito a la ruta activa!`);
+                    // Remover de la lista local para refrescar la vista en tiempo real
+                    todosLosInactivos = todosLosInactivos.filter(c => c.id != id && c.id_cliente != id);
+                    filtrarYMostrar();
+                } else {
+                    const errData = await respuesta.json();
+                    alert("❌ Error al reintegrar: " + (errData.error || "No se pudo procesar"));
+                }
+            } catch (error) {
+                console.error(error);
+                alert("❌ Error de red al intentar reactivar el cliente.");
+            }
+        }
+
+        // FUNCIÓN DE EXPORTACIÓN REQUERIDA (Generación nativa CSV compatible con Excel)
+        function exportarAExcel() {
+            if (clientesFiltrados.length === 0) {
+                return alert("⚠️ No hay datos en la tabla para exportar.");
+            }
+
+            // Encabezados
+            let contenidoCsv = "Doc,Codigo,Nombre del Negocio,Tipo de Negocio,Ciudad,Direccion,Ultimo Pedido\n";
+
+            // Recorrer filas activas en los filtros
+            clientesFiltrados.forEach(c => {
+                const doc = (c.tipo_documento || 'V').trim().toUpperCase();
+                const codigo = c.codigo_cliente;
+                const nombre = `"${(c.nombre_negocio || '').replace(/"/g, '""')}"`;
+                const tipo = `"${(c.tipo_negocio || 'No especificado').replace(/"/g, '""')}"`;
+                const ciudad = `"${(c.ciudad || 'No registrada').replace(/"/g, '""')}"`;
+                const direccion = `"${(c.direccion_limpia || c.direccion || 'No registrada').replace(/"/g, '""')}"`;
+                const ultimoPedido = c.ultima_compra ? new Date(c.ultima_compra).toLocaleDateString('es-ES') : 'Ninguna';
+
+                contenidoCsv += `${doc},${codigo},${nombre},${tipo},${ciudad},${direccion},${ultimoPedido}\n`;
+            });
+
+            // Crear y descargar archivo blob
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), contenidoCsv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Clientes_Desactivados_${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        inicializarPanel();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
