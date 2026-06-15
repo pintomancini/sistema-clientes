@@ -7,12 +7,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 1. Conexión a Base de Datos
+// 1. Conexión a Base de Datos (Usa Railway online o localhost en tu Mac)
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: process.env.DB_PASSWORD, 
-    database: 'Clientes Andreina'
+    host: process.env.MYSQLHOST || 'localhost',
+    user: process.env.MYSQLUSER || 'root',
+    password: process.env.MYSQLPASSWORD || process.env.DB_PASSWORD, 
+    database: process.env.MYSQLDATABASE || 'Clientes Andreina',
+    port: process.env.MYSQLPORT || 3306
 });
 
 db.connect((err) => {
@@ -620,7 +621,7 @@ app.post('/api/sistema/restaurar', upload.single('archivoRespaldo'), async (req,
 });
 
 // Iniciar el servidor local
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor de la app corriendo localmente en http://localhost:${PORT}`);
 });
