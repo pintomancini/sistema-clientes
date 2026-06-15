@@ -194,44 +194,43 @@
         let ordenAscendente = true;
 
         async function inicializarPanel() {
-            try {
-                // 1. Cargar Combobox de Ciudades
-                const resCiudades = await fetch('http://localhost:3000/api/ciudades');
-                const ciudades = await resCiudades.json();
-                const selectCiudad = document.getElementById('filtro-ciudad');
-                ciudades.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.nombre;
-                    opt.textContent = c.nombre;
-                    selectCiudad.appendChild(opt);
-                });
+    try {
+        // 1. Cargar Combobox de Ciudades
+        const resCiudades = await fetch('/api/ciudades');
+        const ciudades = await resCiudades.json();
+        const selectCiudad = document.getElementById('filtro-ciudad');
+        ciudades.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.nombre;
+            opt.textContent = c.nombre;
+            selectCiudad.appendChild(opt);
+        });
 
-                // 2. Cargar Combobox de Tipos de Negocio
-                const resTipos = await fetch('http://localhost:3000/api/tipos-negocio');
-                const tipos = await resTipos.json();
-                const selectNegocio = document.getElementById('filtro-negocio');
-                tipos.forEach(t => {
-                    const opt = document.createElement('option');
-                    opt.value = t.nombre;
-                    opt.textContent = t.nombre;
-                    selectNegocio.appendChild(opt);
-                });
+        // 2. Cargar Combobox de Tipos de Negocio
+        const resTipos = await fetch('/api/tipos-negocio');
+        const tipos = await resTipos.json();
+        const selectNegocio = document.getElementById('filtro-negocio');
+        tipos.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.nombre;
+            opt.textContent = t.nombre;
+            selectNegocio.appendChild(opt);
+        });
 
-                // 3. Descargar el universo total de clientes INACTIVOS del backend
-                // NOTA: Ajusta esta URL si tu endpoint de inactivos se llama diferente
-                const resClientes = await fetch('http://localhost:3000/api/clientes/todos-inactivos');
-                todosLosInactivos = await resClientes.json();
-                
-                clientesFiltrados = [...todosLosInactivos];
-                dibujarTabla(clientesFiltrados);
+        // 3. Descargar el universo total de clientes INACTIVOS del backend
+        const resClientes = await fetch('/api/clientes/todos-inactivos');
+        todosLosInactivos = await resClientes.json();
+        
+        clientesFiltrados = [...todosLosInactivos];
+        dibujarTabla(clientesFiltrados);
 
-            } catch (error) {
-                console.error(error);
-                document.getElementById('tabla-desactivados').innerHTML = `
-                    <tr><td colspan="8" class="text-center text-danger py-4">❌ Error al conectar con los registros de clientes inactivos.</td></tr>
-                `;
-            }
-        }
+    } catch (error) {
+        console.error(error);
+        document.getElementById('tabla-desactivados').innerHTML = `
+            <tr><td colspan="8" class="text-center text-danger py-4">❌ Error al conectar con los registros de clientes inactivos.</td></tr>
+        `;
+    }
+}
 
         // Lógica de Filtros en Desactivados con Buscador Dinámico
 function filtrarYMostrar() {

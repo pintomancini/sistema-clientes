@@ -1,0 +1,6 @@
+# Seguridad del sistema para tu celular
+SISTEMA_USER=andreina
+SISTEMA_PASS=TuClaveSecreta2026
+
+# Tu contraseña de MySQL (que ya estaba expuesta en tu código)
+DB_PASSWORD=261626_Ajpm
