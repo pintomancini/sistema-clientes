@@ -129,7 +129,7 @@
                             </div>
 
                             <div class="col-12 d-flex gap-3 mt-4">
-                                <a href="http://localhost:3000" class="btn btn-sm btn-secondary w-50 py-2 fw-medium" style="border-radius: 8px;">
+                                <a href="/" class="btn btn-sm btn-secondary w-50 py-2 fw-medium" style="border-radius: 8px;">
                                     ⬅️ Volver a Alertas
                                 </a>
                                 <button type="submit" class="btn btn-sm btn-primary w-50 py-2 fw-bold" style="background-color: #3b82f6; border-radius: 8px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);">
@@ -152,7 +152,7 @@
         async function cargarComboboxes() {
             try {
                 // Solicitar ciudades al Backend
-                const resCiudades = await fetch('http://localhost:3000/api/ciudades');
+                const resCiudades = await fetch('/api/ciudades');
                 const ciudades = await resCiudades.json();
                 const selectCiudades = document.getElementById('ciudad_id');
                 ciudades.forEach(c => {
@@ -160,7 +160,7 @@
                 });
 
                 // Solicitar tipos de negocio al Backend
-                const resTipos = await fetch('http://localhost:3000/api/tipos-negocio');
+                const resTipos = await fetch('/api/tipos-negocio');
                 const tipos = await resTipos.json();
                 const selectTipos = document.getElementById('tipo_negocio_id');
                 tipos.forEach(t => {
@@ -213,7 +213,7 @@
 
             // PASO 3: Enviar el paquete de datos de manera segura al Backend
             try {
-                const response = await fetch('http://localhost:3000/api/clientes/registrar', {
+                const response = await fetch('/api/clientes/registrar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(datosCliente)

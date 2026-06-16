@@ -355,7 +355,7 @@ function filtrarYMostrar() {
 
             try {
                 // Petición al Backend para activar al cliente
-                const respuesta = await fetch(`http://localhost:3000/api/clientes/activar-ruta/${id}`, {
+                const respuesta = await fetch(`/api/clientes/activar-ruta/${id}`, {
                       method: 'PUT',
                       headers: { 'Content-Type': 'application/json' }
                  });
