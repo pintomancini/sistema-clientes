@@ -203,7 +203,7 @@
 
             try {
                 // Apuntando a la ruta de restauración de respaldo JSON
-                const respuesta = await fetch('http://localhost:3000/api/sistema/restaurar', {
+                const respuesta = await fetch('/api/sistema/restaurar', {
                     method: 'POST',
                     body: formData
                 });
@@ -285,7 +285,7 @@
             formData.append('modoImportacion', modoSeleccionado);
 
             try {
-                const respuesta = await fetch('http://localhost:3000/api/clientes/importar', {
+                const respuesta = await fetch('/api/clientes/importar', {
                     method: 'POST',
                     body: formData
                 });
